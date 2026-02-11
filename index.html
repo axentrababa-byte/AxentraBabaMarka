@@ -14,7 +14,7 @@ body{
 }
 header{
   text-align:center;
-  padding:50px 20px;
+  padding:60px 20px;
   background:linear-gradient(90deg,#ff1a1a,#990000);
 }
 header h1{
@@ -23,12 +23,12 @@ header h1{
   letter-spacing:3px;
 }
 header p{
-  margin-top:8px;
+  margin-top:10px;
   color:#ddd;
 }
 .container{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:25px;
   padding:40px;
 }
@@ -58,6 +58,7 @@ header p{
   color:#ff1a1a;
   font-weight:700;
   margin-top:10px;
+  font-size:18px;
 }
 button{
   margin-top:15px;
@@ -86,91 +87,50 @@ footer{
 
 <header>
 <h1>AXENTRA STORE VIP</h1>
-<p>KALİTE VE PROFESYONEL DİJİTAL ÇÖZÜMLER</p>
+<p>Premium Dijital Ürün Platformu</p>
 <p>Android • iOS • PC • Premium Paketler • 7/24 Destek</p>
 </header>
 
-<div class="container" id="productList">
-
-<!-- STATİK ÜRÜNLER -->
-
-<div class="card">
-<img src="https://flokistorevip.netlify.app/2">
-<h3>ZOLO Premium Android</h3>
-<p>Mobil kullanıcılar için optimize edilmiş premium paket</p>
-<p class="price">450 – 950 ₺</p>
-<button onclick="buyProduct('ZOLO Premium Android')">
-TELEGRAM'DAN SATIN AL →
-</button>
-</div>
-
-<div class="card">
-<img src="https://flokistorevip.netlify.app/3">
-<h3>CONTRA Mobile Suite</h3>
-<p>Yüksek performanslı dijital çözüm paketi</p>
-<p class="price">500 – 1100 ₺</p>
-<button onclick="buyProduct('CONTRA Mobile Suite')">
-TELEGRAM'DAN SATIN AL →
-</button>
-</div>
-
-<div class="card">
-<img src="https://flokistorevip.netlify.app/4">
-<h3>SHELD Premium Access</h3>
-<p>Gelişmiş özelliklere sahip özel sürüm</p>
-<p class="price">550 – 1200 ₺</p>
-<button onclick="buyProduct('SHELD Premium Access')">
-TELEGRAM'DAN SATIN AL →
-</button>
-</div>
-
-<div class="card">
-<img src="https://flokistorevip.netlify.app/5">
-<h3>KING Elite Package</h3>
-<p>Profesyonel kullanıcılar için üst seviye paket</p>
-<p class="price">700 – 1500 ₺</p>
-<button onclick="buyProduct('KING Elite Package')">
-TELEGRAM'DAN SATIN AL →
-</button>
-</div>
-
-<div class="card">
-<img src="https://flokistorevip.netlify.app/6">
-<h3>KING iOS Edition</h3>
-<p>iOS uyumlu premium sürüm</p>
-<p class="price">650 – 1400 ₺</p>
-<button onclick="buyProduct('KING iOS Edition')">
-TELEGRAM'DAN SATIN AL →
-</button>
-</div>
-
-</div>
+<div class="container" id="productList"></div>
 
 <footer>
 © 2026 AxentraStore - Tüm Hakları Saklıdır
 </footer>
 
 <script>
-
 const telegramLink = "https://t.me/AxentraBio";
 
-/* BURAYA SONRADAN ÜRÜN EKLEYEBİLİRSİN */
 const products = [
-
   {
-    name: "Premium Paket",
-    desc: "Yüksek performanslı dijital hizmet",
-    price: "500",
-    image: "https://via.placeholder.com/400x250"
+    name: "ZOLO Premium Android",
+    desc: "Mobil kullanıcılar için optimize edilmiş premium paket",
+    price: "450 – 950",
+    image: "https://flokistorevip.netlify.app/2"
   },
-
   {
-    name: "Elite Paket",
-    desc: "Profesyonel kullanıcılar için",
-    price: "900",
-    image: "https://via.placeholder.com/400x250"
+    name: "CONTRA Mobile Suite",
+    desc: "Yüksek performanslı dijital çözüm paketi",
+    price: "500 – 1100",
+    image: "https://flokistorevip.netlify.app/3"
+  },
+  {
+    name: "SHELD Premium Access",
+    desc: "Gelişmiş özelliklere sahip özel sürüm",
+    price: "550 – 1200",
+    image: "https://flokistorevip.netlify.app/4"
+  },
+  {
+    name: "KING Elite Package",
+    desc: "Profesyonel kullanıcılar için üst seviye paket",
+    price: "700 – 1500",
+    image: "https://flokistorevip.netlify.app/5"
+  },
+  {
+    name: "KING iOS Edition",
+    desc: "iOS uyumlu premium sürüm",
+    price: "650 – 1400",
+    image: "https://flokistorevip.netlify.app/6"
   }
-
 ];
 
 const container = document.getElementById("productList");
@@ -183,7 +143,9 @@ products.forEach(product=>{
     <h3>${product.name}</h3>
     <p>${product.desc}</p>
     <div class="price">${product.price} ₺</div>
-    <button onclick="buyProduct('${product.name}')">TELEGRAM'DAN SATIN AL</button>
+    <button onclick="buyProduct('${product.name}')">
+      TELEGRAM'DAN SATIN AL →
+    </button>
   `;
   container.appendChild(card);
 });
@@ -191,8 +153,7 @@ products.forEach(product=>{
 function buyProduct(name){
   window.location.href = telegramLink + "?start=" + encodeURIComponent(name);
 }
-
 </script>
 
 </body>
-  </html>
+</html>
