@@ -58,10 +58,12 @@ Toplam Ürün: <span id="totalProducts">0</span>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
 <script>
+// -------- CONFIG --------
 const ADMIN_PASSWORD="Axentra2026!";
 const telegramLink="https://t.me/AxentraBio";
 let isAdmin=false;
 
+// Firebase initialize
 firebase.initializeApp({
 apiKey:"AIzaSyDBL2_jF-eKDTR-5hV5I2eO1f43lEH8K6E",
 authDomain:"axentrastore-19480.firebaseapp.com",
@@ -75,6 +77,33 @@ const db=firebase.firestore();
 const storage=firebase.storage();
 const productList=document.getElementById("productList");
 
+// -------- FAKED FLoki ÜRÜNLER --------
+const products = [
+  {name:"Floki Premium Card", price:"500", image:"https://via.placeholder.com/300x200?text=Floki+1"},
+  {name:"Floki Starter Pack", price:"1200", image:"https://via.placeholder.com/300x200?text=Floki+2"},
+  {name:"Floki Ultimate Kit", price:"2500", image:"https://via.placeholder.com/300x200?text=Floki+3"},
+  {name:"Floki Booster", price:"750", image:"https://via.placeholder.com/300x200?text=Floki+4"},
+  {name:"Floki VIP Access", price:"1800", image:"https://via.placeholder.com/300x200?text=Floki+5"}
+];
+
+function loadFlokiProducts() {
+    products.forEach(p => {
+        let stock = Math.floor(Math.random()*20)+5;
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <img src="${p.image}">
+            <h3>${p.name}</h3>
+            <div class="price">${p.price} ₺</div>
+            <div class="stock">Stok: <span id="stock-${p.name.replace(/\s/g,'')}">${stock}</span></div>
+            <button onclick="buyProduct('${p.name}')">Satın Al</button>
+        `;
+        productList.appendChild(card);
+        startFakeStock(`stock-${p.name.replace(/\s/g,'')}`, stock);
+    });
+}
+
+// -------- ADMIN --------
 function login(){
 let pass=prompt("Admin Şifresi:");
 if(pass===ADMIN_PASSWORD){
@@ -105,14 +134,18 @@ err=>alert("Hata"),
 task.snapshot.ref.getDownloadURL().then(url=>{
 db.collection("products").add({name,price,image:url,sales:0,stock:Math.floor(Math.random()*20)+5});
 progress.innerText="Tamamlandı!";
+document.getElementById("name").value="";
+document.getElementById("price").value="";
+document.getElementById("imageFile").value="";
 });
 });
 }
 
+// -------- FIRESTORE ÜRÜN GÖSTER --------
 db.collection("products").onSnapshot(snap=>{
 productList.innerHTML="";
 let totalSales=0;
-document.getElementById("totalProducts").innerText=snap.size;
+document.getElementById("totalProducts").innerText=snap.size + products.length; // + Floki ürünleri
 snap.forEach(doc=>{
 let d=doc.data();
 totalSales+=d.sales;
@@ -132,28 +165,28 @@ productList.appendChild(card);
 document.getElementById("totalSales").innerText=totalSales;
 });
 
+// -------- SATIN AL / SIL --------
 function buy(id,name,sales,stock){
 if(stock<=0)return alert("Stok bitti");
 db.collection("products").doc(id).update({sales:sales+1,stock:stock-1});
 window.location.href=telegramLink+"?start="+encodeURIComponent(name);
 }
-
-function del(id){
-if(!isAdmin)return;
-db.collection("products").doc(id).delete();
+function buyProduct(name){
+window.location.href=telegramLink+"?start="+encodeURIComponent(name);
 }
+function del(id){if(!isAdmin)return;db.collection("products").doc(id).delete();}
 
+// -------- SEARCH / FAKE --------
 function searchProduct(text){
 let cards=document.querySelectorAll(".card");
 cards.forEach(c=>{
 c.style.display=c.innerText.toLowerCase().includes(text.toLowerCase())?"block":"none";
 });
 }
-
-setInterval(()=>{
-document.getElementById("liveUsers").innerText=Math.floor(Math.random()*50)+10;
-},3000);
-
+function startFakeStock(id,stock){
+setInterval(()=>{if(stock>1){stock--;document.getElementById(id).innerText=stock;}},5000);
+}
+setInterval(()=>{document.getElementById("liveUsers").innerText=Math.floor(Math.random()*50)+10;},3000);
 setInterval(()=>{
 let popup=document.getElementById("fakeBuy");
 let names=["Ahmet","Mehmet","Kerem","Ali","Hakan","Emre"];
@@ -162,6 +195,9 @@ popup.innerText=randomName+" bir ürün satın aldı!";
 popup.style.display="block";
 setTimeout(()=>popup.style.display="none",3000);
 },8000);
+
+// -------- SAYFA YÜKLENİNCE --------
+window.onload = loadFlokiProducts;
 </script>
 
 </body>
