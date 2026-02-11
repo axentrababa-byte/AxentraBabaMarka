@@ -4,201 +4,195 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AxentraStore VIP</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:Poppins;background:#0f0f0f;color:white;overflow-x:hidden}
-header{text-align:center;padding:40px;background:linear-gradient(45deg,#ff0000,#000)}
-.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:30px}
-.card{background:#1a1a1a;border-radius:15px;padding:20px;text-align:center;transition:.3s}
-.card:hover{transform:scale(1.05)}
-.card img{width:100%;border-radius:10px}
-button{margin-top:10px;background:#ff0000;border:none;padding:10px;border-radius:8px;color:white;cursor:pointer}
-button:hover{background:white;color:#ff0000}
-.admin{display:none;background:#111;padding:20px;margin:20px;border-radius:15px}
-.progress{color:#00ff99;font-size:14px}
-.topbar{display:flex;justify-content:space-between;padding:10px 20px;background:#111}
-.search{padding:8px;border-radius:8px;border:none}
-.popup{position:fixed;bottom:20px;left:20px;background:#111;padding:15px;border-radius:10px;display:none}
-.stats{padding:20px;text-align:center;background:#111}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f0f0f,#1c1c1c);
+  color:white;
+}
+header{
+  text-align:center;
+  padding:50px 20px;
+  background:linear-gradient(90deg,#ff1a1a,#990000);
+}
+header h1{
+  margin:0;
+  font-size:42px;
+  letter-spacing:3px;
+}
+header p{
+  margin-top:8px;
+  color:#ddd;
+}
+.container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:25px;
+  padding:40px;
+}
+.card{
+  background:#1a1a1a;
+  border-radius:18px;
+  padding:20px;
+  text-align:center;
+  transition:.3s;
+  box-shadow:0 0 20px rgba(255,0,0,0.1);
+}
+.card:hover{
+  transform:translateY(-8px);
+}
+.card img{
+  width:100%;
+  border-radius:12px;
+}
+.card h3{
+  margin:15px 0 5px;
+}
+.card p{
+  color:#ccc;
+  font-size:14px;
+}
+.price{
+  color:#ff1a1a;
+  font-weight:700;
+  margin-top:10px;
+}
+button{
+  margin-top:15px;
+  background:#ff1a1a;
+  border:none;
+  padding:12px 20px;
+  border-radius:10px;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
+}
+button:hover{
+  background:white;
+  color:#ff1a1a;
+}
+footer{
+  text-align:center;
+  padding:20px;
+  background:#111;
+  color:#777;
+}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-<div>👥 Canlı: <span id="liveUsers">0</span></div>
-<input type="text" class="search" placeholder="Ürün ara..." onkeyup="searchProduct(this.value)">
-<div onclick="login()" style="cursor:pointer">🔐 Admin</div>
-</div>
-
 <header>
 <h1>AXENTRA STORE VIP</h1>
-<p>Premium Dijital Ürün Platformu</p>
+<p>KALİTE VE PROFESYONEL DİJİTAL ÇÖZÜMLER</p>
+<p>Android • iOS • PC • Premium Paketler • 7/24 Destek</p>
 </header>
 
-<div class="stats">
-Toplam Satış: <span id="totalSales">0</span> |
-Toplam Ürün: <span id="totalProducts">0</span>
+<div class="container" id="productList">
+
+<!-- STATİK ÜRÜNLER -->
+
+<div class="card">
+<img src="https://flokistorevip.netlify.app/2">
+<h3>ZOLO Premium Android</h3>
+<p>Mobil kullanıcılar için optimize edilmiş premium paket</p>
+<p class="price">450 – 950 ₺</p>
+<button onclick="buyProduct('ZOLO Premium Android')">
+TELEGRAM'DAN SATIN AL →
+</button>
 </div>
 
-<div class="container" id="productList"></div>
-
-<div class="admin" id="adminPanel">
-<h3>Ürün Ekle</h3>
-<input type="text" id="name" placeholder="Ürün Adı"><br><br>
-<input type="text" id="price" placeholder="Fiyat"><br><br>
-<input type="file" id="imageFile"><br>
-<div class="progress" id="uploadProgress"></div><br>
-<button onclick="addProduct()">Ekle</button>
+<div class="card">
+<img src="https://flokistorevip.netlify.app/3">
+<h3>CONTRA Mobile Suite</h3>
+<p>Yüksek performanslı dijital çözüm paketi</p>
+<p class="price">500 – 1100 ₺</p>
+<button onclick="buyProduct('CONTRA Mobile Suite')">
+TELEGRAM'DAN SATIN AL →
+</button>
 </div>
 
-<div class="popup" id="fakeBuy"></div>
+<div class="card">
+<img src="https://flokistorevip.netlify.app/4">
+<h3>SHELD Premium Access</h3>
+<p>Gelişmiş özelliklere sahip özel sürüm</p>
+<p class="price">550 – 1200 ₺</p>
+<button onclick="buyProduct('SHELD Premium Access')">
+TELEGRAM'DAN SATIN AL →
+</button>
+</div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<div class="card">
+<img src="https://flokistorevip.netlify.app/5">
+<h3>KING Elite Package</h3>
+<p>Profesyonel kullanıcılar için üst seviye paket</p>
+<p class="price">700 – 1500 ₺</p>
+<button onclick="buyProduct('KING Elite Package')">
+TELEGRAM'DAN SATIN AL →
+</button>
+</div>
+
+<div class="card">
+<img src="https://flokistorevip.netlify.app/6">
+<h3>KING iOS Edition</h3>
+<p>iOS uyumlu premium sürüm</p>
+<p class="price">650 – 1400 ₺</p>
+<button onclick="buyProduct('KING iOS Edition')">
+TELEGRAM'DAN SATIN AL →
+</button>
+</div>
+
+</div>
+
+<footer>
+© 2026 AxentraStore - Tüm Hakları Saklıdır
+</footer>
 
 <script>
-// -------- CONFIG --------
-const ADMIN_PASSWORD="Axentra2026!";
-const telegramLink="https://t.me/AxentraBio";
-let isAdmin=false;
 
-// Firebase initialize
-firebase.initializeApp({
-apiKey:"AIzaSyDBL2_jF-eKDTR-5hV5I2eO1f43lEH8K6E",
-authDomain:"axentrastore-19480.firebaseapp.com",
-projectId:"axentrastore-19480",
-storageBucket:"axentrastore-19480.firebasestorage.app",
-messagingSenderId:"119744736021",
-appId:"1:119744736021:web:7698089459bc06c409171c"
-});
+const telegramLink = "https://t.me/AxentraBio";
 
-const db=firebase.firestore();
-const storage=firebase.storage();
-const productList=document.getElementById("productList");
-
-// -------- FAKED FLoki ÜRÜNLER --------
+/* BURAYA SONRADAN ÜRÜN EKLEYEBİLİRSİN */
 const products = [
-  {name:"Floki Premium Card", price:"500", image:"https://via.placeholder.com/300x200?text=Floki+1"},
-  {name:"Floki Starter Pack", price:"1200", image:"https://via.placeholder.com/300x200?text=Floki+2"},
-  {name:"Floki Ultimate Kit", price:"2500", image:"https://via.placeholder.com/300x200?text=Floki+3"},
-  {name:"Floki Booster", price:"750", image:"https://via.placeholder.com/300x200?text=Floki+4"},
-  {name:"Floki VIP Access", price:"1800", image:"https://via.placeholder.com/300x200?text=Floki+5"}
+
+  {
+    name: "Premium Paket",
+    desc: "Yüksek performanslı dijital hizmet",
+    price: "500",
+    image: "https://via.placeholder.com/400x250"
+  },
+
+  {
+    name: "Elite Paket",
+    desc: "Profesyonel kullanıcılar için",
+    price: "900",
+    image: "https://via.placeholder.com/400x250"
+  }
+
 ];
 
-function loadFlokiProducts() {
-    products.forEach(p => {
-        let stock = Math.floor(Math.random()*20)+5;
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-            <img src="${p.image}">
-            <h3>${p.name}</h3>
-            <div class="price">${p.price} ₺</div>
-            <div class="stock">Stok: <span id="stock-${p.name.replace(/\s/g,'')}">${stock}</span></div>
-            <button onclick="buyProduct('${p.name}')">Satın Al</button>
-        `;
-        productList.appendChild(card);
-        startFakeStock(`stock-${p.name.replace(/\s/g,'')}`, stock);
-    });
-}
+const container = document.getElementById("productList");
 
-// -------- ADMIN --------
-function login(){
-let pass=prompt("Admin Şifresi:");
-if(pass===ADMIN_PASSWORD){
-isAdmin=true;
-document.getElementById("adminPanel").style.display="block";
-alert("Giriş başarılı");
-}
-}
-
-function addProduct(){
-if(!isAdmin)return alert("Admin gerekli");
-let name=document.getElementById("name").value;
-let price=document.getElementById("price").value;
-let file=document.getElementById("imageFile").files[0];
-let progress=document.getElementById("uploadProgress");
-if(!name||!price||!file)return alert("Boş bırakma");
-
-let ref=storage.ref("products/"+Date.now()+"_"+file.name);
-let task=ref.put(file);
-
-task.on("state_changed",
-snap=>{
-let percent=(snap.bytesTransferred/snap.totalBytes)*100;
-progress.innerText="Yükleniyor: "+percent.toFixed(0)+"%";
-},
-err=>alert("Hata"),
-()=>{
-task.snapshot.ref.getDownloadURL().then(url=>{
-db.collection("products").add({name,price,image:url,sales:0,stock:Math.floor(Math.random()*20)+5});
-progress.innerText="Tamamlandı!";
-document.getElementById("name").value="";
-document.getElementById("price").value="";
-document.getElementById("imageFile").value="";
-});
-});
-}
-
-// -------- FIRESTORE ÜRÜN GÖSTER --------
-db.collection("products").onSnapshot(snap=>{
-productList.innerHTML="";
-let totalSales=0;
-document.getElementById("totalProducts").innerText=snap.size + products.length; // + Floki ürünleri
-snap.forEach(doc=>{
-let d=doc.data();
-totalSales+=d.sales;
-let card=document.createElement("div");
-card.className="card";
-card.innerHTML=`
-<img src="${d.image}">
-<h3>${d.name}</h3>
-<p>${d.price} ₺</p>
-<p>Stok: ${d.stock}</p>
-<p>Satış: ${d.sales}</p>
-<button onclick="buy('${doc.id}','${d.name}',${d.sales},${d.stock})">Satın Al</button>
-${isAdmin?`<button onclick="del('${doc.id}')">Sil</button>`:""}
-`;
-productList.appendChild(card);
-});
-document.getElementById("totalSales").innerText=totalSales;
+products.forEach(product=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <img src="${product.image}">
+    <h3>${product.name}</h3>
+    <p>${product.desc}</p>
+    <div class="price">${product.price} ₺</div>
+    <button onclick="buyProduct('${product.name}')">TELEGRAM'DAN SATIN AL</button>
+  `;
+  container.appendChild(card);
 });
 
-// -------- SATIN AL / SIL --------
-function buy(id,name,sales,stock){
-if(stock<=0)return alert("Stok bitti");
-db.collection("products").doc(id).update({sales:sales+1,stock:stock-1});
-window.location.href=telegramLink+"?start="+encodeURIComponent(name);
-}
 function buyProduct(name){
-window.location.href=telegramLink+"?start="+encodeURIComponent(name);
+  window.location.href = telegramLink + "?start=" + encodeURIComponent(name);
 }
-function del(id){if(!isAdmin)return;db.collection("products").doc(id).delete();}
 
-// -------- SEARCH / FAKE --------
-function searchProduct(text){
-let cards=document.querySelectorAll(".card");
-cards.forEach(c=>{
-c.style.display=c.innerText.toLowerCase().includes(text.toLowerCase())?"block":"none";
-});
-}
-function startFakeStock(id,stock){
-setInterval(()=>{if(stock>1){stock--;document.getElementById(id).innerText=stock;}},5000);
-}
-setInterval(()=>{document.getElementById("liveUsers").innerText=Math.floor(Math.random()*50)+10;},3000);
-setInterval(()=>{
-let popup=document.getElementById("fakeBuy");
-let names=["Ahmet","Mehmet","Kerem","Ali","Hakan","Emre"];
-let randomName=names[Math.floor(Math.random()*names.length)];
-popup.innerText=randomName+" bir ürün satın aldı!";
-popup.style.display="block";
-setTimeout(()=>popup.style.display="none",3000);
-},8000);
-
-// -------- SAYFA YÜKLENİNCE --------
-window.onload = loadFlokiProducts;
 </script>
 
 </body>
-</html>
+  </html>
