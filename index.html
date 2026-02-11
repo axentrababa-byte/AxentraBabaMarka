@@ -5,211 +5,163 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AxentraStore VIP</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
 <style>
-body{
-    margin:0;
-    font-family:'Poppins', sans-serif;
-    background:#0f0f0f;
-    color:white;
-}
-header{
-    text-align:center;
-    padding:50px 20px;
-    background:linear-gradient(45deg,#ff0000,#000);
-    animation: glow 3s infinite alternate;
-}
-@keyframes glow{
-    from{box-shadow:0 0 10px #ff0000;}
-    to{box-shadow:0 0 30px #ff0000;}
-}
-header h1{
-    margin:0;
-    font-size:40px;
-    letter-spacing:3px;
-}
-.container{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-    padding:40px;
-}
-.card{
-    background:#1a1a1a;
-    border-radius:15px;
-    padding:20px;
-    text-align:center;
-    transition:0.3s;
-}
-.card:hover{ transform:translateY(-7px); }
-.card img{
-    width:100%;
-    border-radius:10px;
-}
-.price{ margin:10px 0; font-size:20px; color:#ff0000; font-weight:700; }
-.stock{ font-size:14px; color:#00ff99; }
-.sales{ font-size:13px; color:#ffaa00; }
-button{
-    margin-top:10px;
-    background:#ff0000;
-    border:none;
-    padding:10px 15px;
-    border-radius:8px;
-    color:white;
-    font-weight:600;
-    cursor:pointer;
-}
-button:hover{ background:white; color:#ff0000; }
-
-.admin{
-    display:none;
-    background:#111;
-    padding:20px;
-    margin:30px;
-    border-radius:15px;
-}
-.admin input{
-    padding:10px;
-    margin:5px;
-    border:none;
-    border-radius:8px;
-}
-.admin-toggle{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#ff0000;
-    padding:12px 18px;
-    border-radius:50px;
-    cursor:pointer;
-}
-.delete-btn{
-    background:#444;
-    margin-top:5px;
-}
-.delete-btn:hover{
-    background:#ff0000;
-    color:white;
-}
-footer{
-    text-align:center;
-    padding:20px;
-    background:#111;
-    color:#777;
-}
+body{margin:0;font-family:Poppins;background:#0f0f0f;color:white;overflow-x:hidden}
+header{text-align:center;padding:40px;background:linear-gradient(45deg,#ff0000,#000)}
+.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:30px}
+.card{background:#1a1a1a;border-radius:15px;padding:20px;text-align:center;transition:.3s}
+.card:hover{transform:scale(1.05)}
+.card img{width:100%;border-radius:10px}
+button{margin-top:10px;background:#ff0000;border:none;padding:10px;border-radius:8px;color:white;cursor:pointer}
+button:hover{background:white;color:#ff0000}
+.admin{display:none;background:#111;padding:20px;margin:20px;border-radius:15px}
+.progress{color:#00ff99;font-size:14px}
+.topbar{display:flex;justify-content:space-between;padding:10px 20px;background:#111}
+.search{padding:8px;border-radius:8px;border:none}
+.popup{position:fixed;bottom:20px;left:20px;background:#111;padding:15px;border-radius:10px;display:none}
+.stats{padding:20px;text-align:center;background:#111}
 </style>
 </head>
 <body>
+
+<div class="topbar">
+<div>👥 Canlı: <span id="liveUsers">0</span></div>
+<input type="text" class="search" placeholder="Ürün ara..." onkeyup="searchProduct(this.value)">
+<div onclick="login()" style="cursor:pointer">🔐 Admin</div>
+</div>
 
 <header>
 <h1>AXENTRA STORE VIP</h1>
 <p>Premium Dijital Ürün Platformu</p>
 </header>
 
+<div class="stats">
+Toplam Satış: <span id="totalSales">0</span> |
+Toplam Ürün: <span id="totalProducts">0</span>
+</div>
+
 <div class="container" id="productList"></div>
 
 <div class="admin" id="adminPanel">
-<h3>Admin Panel</h3>
-<input type="text" id="name" placeholder="Ürün Adı">
-<input type="text" id="price" placeholder="Fiyat">
-<input type="text" id="image" placeholder="Resim Linki">
-<button onclick="addProduct()">Ürün Ekle</button>
+<h3>Ürün Ekle</h3>
+<input type="text" id="name" placeholder="Ürün Adı"><br><br>
+<input type="text" id="price" placeholder="Fiyat"><br><br>
+<input type="file" id="imageFile"><br>
+<div class="progress" id="uploadProgress"></div><br>
+<button onclick="addProduct()">Ekle</button>
 </div>
 
-<div class="admin-toggle" onclick="openAdmin()">ADMIN</div>
-
-<footer>
-© 2026 AxentraStore - Tüm Hakları Saklıdır
-</footer>
+<div class="popup" id="fakeBuy"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
 <script>
-const telegramLink = "https://t.me/AxentraBio";
-const ADMIN_PASSWORD = "1234"; // şifre değiştir
-const productList = document.getElementById("productList");
+const ADMIN_PASSWORD="Axentra2026!";
+const telegramLink="https://t.me/AxentraBio";
+let isAdmin=false;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDBL2_jF-eKDTR-5hV5I2eO1f43lEH8K6E",
-  authDomain: "axentrastore-19480.firebaseapp.com",
-  projectId: "axentrastore-19480",
-  storageBucket: "axentrastore-19480.firebasestorage.app",
-  messagingSenderId: "119744736021",
-  appId: "1:119744736021:web:7698089459bc06c409171c"
-};
+firebase.initializeApp({
+apiKey:"AIzaSyDBL2_jF-eKDTR-5hV5I2eO1f43lEH8K6E",
+authDomain:"axentrastore-19480.firebaseapp.com",
+projectId:"axentrastore-19480",
+storageBucket:"axentrastore-19480.firebasestorage.app",
+messagingSenderId:"119744736021",
+appId:"1:119744736021:web:7698089459bc06c409171c"
+});
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db=firebase.firestore();
+const storage=firebase.storage();
+const productList=document.getElementById("productList");
 
-function openAdmin(){
-    const pass = prompt("Admin Şifresi:");
-    if(pass === ADMIN_PASSWORD){
-        document.getElementById("adminPanel").style.display="block";
-    }else{
-        alert("Hatalı şifre!");
-    }
+function login(){
+let pass=prompt("Admin Şifresi:");
+if(pass===ADMIN_PASSWORD){
+isAdmin=true;
+document.getElementById("adminPanel").style.display="block";
+alert("Giriş başarılı");
+}
 }
 
 function addProduct(){
-    const name = document.getElementById("name").value;
-    const price = document.getElementById("price").value;
-    const image = document.getElementById("image").value;
+if(!isAdmin)return alert("Admin gerekli");
+let name=document.getElementById("name").value;
+let price=document.getElementById("price").value;
+let file=document.getElementById("imageFile").files[0];
+let progress=document.getElementById("uploadProgress");
+if(!name||!price||!file)return alert("Boş bırakma");
 
-    if(!name || !price) return alert("Boş alan bırakma!");
+let ref=storage.ref("products/"+Date.now()+"_"+file.name);
+let task=ref.put(file);
 
-    db.collection("products").add({
-        name:name,
-        price:price,
-        image:image || "https://via.placeholder.com/300x200",
-        stock: Math.floor(Math.random()*20)+5,
-        sales:0
-    });
-
-    document.getElementById("name").value="";
-    document.getElementById("price").value="";
-    document.getElementById("image").value="";
+task.on("state_changed",
+snap=>{
+let percent=(snap.bytesTransferred/snap.totalBytes)*100;
+progress.innerText="Yükleniyor: "+percent.toFixed(0)+"%";
+},
+err=>alert("Hata"),
+()=>{
+task.snapshot.ref.getDownloadURL().then(url=>{
+db.collection("products").add({name,price,image:url,sales:0,stock:Math.floor(Math.random()*20)+5});
+progress.innerText="Tamamlandı!";
+});
+});
 }
 
-db.collection("products").onSnapshot(snapshot=>{
-    productList.innerHTML="";
-    snapshot.forEach(doc=>{
-        const data = doc.data();
-
-        const card = document.createElement("div");
-        card.className="card";
-
-        card.innerHTML=`
-            <img src="${data.image}">
-            <h3>${data.name}</h3>
-            <div class="price">${data.price} ₺</div>
-            <div class="stock">Stok: ${data.stock}</div>
-            <div class="sales">Satış: ${data.sales}</div>
-            <button onclick="buyProduct('${doc.id}','${data.name}',${data.sales})">Satın Al</button>
-            <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Sil</button>
-        `;
-
-        productList.appendChild(card);
-    });
+db.collection("products").onSnapshot(snap=>{
+productList.innerHTML="";
+let totalSales=0;
+document.getElementById("totalProducts").innerText=snap.size;
+snap.forEach(doc=>{
+let d=doc.data();
+totalSales+=d.sales;
+let card=document.createElement("div");
+card.className="card";
+card.innerHTML=`
+<img src="${d.image}">
+<h3>${d.name}</h3>
+<p>${d.price} ₺</p>
+<p>Stok: ${d.stock}</p>
+<p>Satış: ${d.sales}</p>
+<button onclick="buy('${doc.id}','${d.name}',${d.sales},${d.stock})">Satın Al</button>
+${isAdmin?`<button onclick="del('${doc.id}')">Sil</button>`:""}
+`;
+productList.appendChild(card);
+});
+document.getElementById("totalSales").innerText=totalSales;
 });
 
-function buyProduct(id,name,sales){
-    db.collection("products").doc(id).update({
-        sales:sales+1
-    });
-
-    const message = encodeURIComponent("Merhaba, " + name + " satın almak istiyorum.");
-    window.location.href = telegramLink + "?start=" + message;
+function buy(id,name,sales,stock){
+if(stock<=0)return alert("Stok bitti");
+db.collection("products").doc(id).update({sales:sales+1,stock:stock-1});
+window.location.href=telegramLink+"?start="+encodeURIComponent(name);
 }
 
-function deleteProduct(id){
-    const pass = prompt("Silmek için admin şifresi:");
-    if(pass === ADMIN_PASSWORD){
-        db.collection("products").doc(id).delete();
-    }else{
-        alert("Yanlış şifre!");
-    }
+function del(id){
+if(!isAdmin)return;
+db.collection("products").doc(id).delete();
 }
+
+function searchProduct(text){
+let cards=document.querySelectorAll(".card");
+cards.forEach(c=>{
+c.style.display=c.innerText.toLowerCase().includes(text.toLowerCase())?"block":"none";
+});
+}
+
+setInterval(()=>{
+document.getElementById("liveUsers").innerText=Math.floor(Math.random()*50)+10;
+},3000);
+
+setInterval(()=>{
+let popup=document.getElementById("fakeBuy");
+let names=["Ahmet","Mehmet","Kerem","Ali","Hakan","Emre"];
+let randomName=names[Math.floor(Math.random()*names.length)];
+popup.innerText=randomName+" bir ürün satın aldı!";
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",3000);
+},8000);
 </script>
 
 </body>
