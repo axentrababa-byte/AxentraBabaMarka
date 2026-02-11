@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AxentraStore VIP</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body{
+    margin:0;
+    font-family:'Poppins', sans-serif;
+    background:#0f0f0f;
+    color:white;
+}
+header{
+    text-align:center;
+    padding:50px 20px;
+    background:linear-gradient(45deg,#ff0000,#000);
+    animation: glow 3s infinite alternate;
+}
+@keyframes glow{
+    from{box-shadow:0 0 10px #ff0000;}
+    to{box-shadow:0 0 30px #ff0000;}
+}
+header h1{
+    margin:0;
+    font-size:40px;
+    letter-spacing:3px;
+}
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    padding:40px;
+}
+.card{
+    background:#1a1a1a;
+    border-radius:15px;
+    padding:20px;
+    text-align:center;
+    transition:0.3s;
+    position:relative;
+    overflow:hidden;
+}
+.card:hover{
+    transform:translateY(-7px);
+}
+.card img{
+    width:100%;
+    border-radius:10px;
+}
+.price{
+    margin:10px 0;
+    font-size:20px;
+    color:#ff0000;
+    font-weight:700;
+}
+.stock{
+    font-size:14px;
+    color:#00ff99;
+}
+button{
+    margin-top:10px;
+    background:#ff0000;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+button:hover{
+    background:white;
+    color:#ff0000;
+}
+.admin{
+    background:#111;
+    padding:20px;
+    margin:30px;
+    border-radius:15px;
+}
+.admin input{
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+}
+footer{
+    text-align:center;
+    padding:20px;
+    background:#111;
+    color:#777;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>AXENTRA STORE VIP</h1>
+<p>Premium Dijital Ürün Platformu</p>
+</header>
+
+<div class="container" id="productList"></div>
+
+<div class="admin">
+<h3>Admin Panel - Ürün Ekle</h3>
+<input type="text" id="name" placeholder="Ürün Adı">
+<input type="text" id="price" placeholder="Fiyat">
+<input type="text" id="image" placeholder="Resim Linki">
+<button onclick="addProduct()">Ürün Ekle</button>
+</div>
+
+<footer>
+© 2026 AxentraStore - Tüm Hakları Saklıdır
+</footer>
+
+<script>
+const telegramLink = "https://t.me/AxentraBio";
+const productList = document.getElementById("productList");
+
+function addProduct(){
+    const name = document.getElementById("name").value;
+    const price = document.getElementById("price").value;
+    const image = document.getElementById("image").value;
+
+    let stock = Math.floor(Math.random()*20)+5;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+        <img src="${image || 'https://via.placeholder.com/300x200'}">
+        <h3>${name}</h3>
+        <div class="price">${price} ₺</div>
+        <div class="stock">Stok: <span id="stock-${name}">${stock}</span></div>
+        <button onclick="buyProduct('${name}')">Satın Al</button>
+    `;
+
+    productList.appendChild(card);
+
+    startFakeStock(`stock-${name}`, stock);
+}
+
+function buyProduct(productName){
+    const message = encodeURIComponent("Merhaba, " + productName + " satın almak istiyorum.");
+    window.location.href = telegramLink + "?start=" + message;
+}
+
+function startFakeStock(id, stock){
+    setInterval(()=>{
+        if(stock > 1){
+            stock--;
+            document.getElementById(id).innerText = stock;
+        }
+    }, 5000);
+}
+</script>
+
+</body>
+</html>
